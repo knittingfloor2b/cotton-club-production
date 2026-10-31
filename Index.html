@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root{--bg:#f3f6fb;--card:#fff;--ink:#172033;--muted:#64748b;--line:#e2e8f0;--brand:#1d4ed8;--brand2:#0f2f72;--green:#15803d;--red:#b91c1c}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,Segoe UI,Arial,sans-serif}
+    button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:9px;padding:10px 14px;font-weight:650}
+    .hidden{display:none!important}.login-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#0f2f72,#2563eb)}
+    .login{width:min(410px,100%);background:#fff;padding:30px;border-radius:20px;box-shadow:0 20px 60px #0b1b3a55}
+    .logo{width:52px;height:52px;border-radius:15px;background:#1d4ed8;color:white;display:grid;place-items:center;font-size:19px;font-weight:900;margin-bottom:14px}
+    h1{font-size:20px;margin:0 0 4px}.sub{color:var(--muted);margin-bottom:22px}
+    .field{display:grid;gap:6px;margin:12px 0}.field label{font-size:12px;font-weight:700;color:#475569}
+    input,select{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px;background:white;color:var(--ink);min-width:0}
+    input:focus,select:focus{outline:2px solid #bfdbfe;border-color:#60a5fa}
+    .primary{background:var(--brand);color:white}.soft{background:#eaf1ff;color:#1e40af}.danger{background:#fee2e2;color:#991b1b}.success{background:#dcfce7;color:#166534}
+    .login .primary{width:100%;margin-top:8px}.switch{margin-top:15px;color:var(--muted);text-align:center}.switch a{color:var(--brand);cursor:pointer;font-weight:700}
+    header{background:var(--brand2);color:white;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:5}
+    header strong{font-size:16px}header small{display:block;color:#cbd5e1;font-size:11px}
+    .head-right{display:flex;align-items:center;gap:10px}.head-right button{background:#ffffff1c;color:white;border:1px solid #ffffff44}
+    .layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+    nav{background:#fff;border-right:1px solid var(--line);padding:16px 12px}
+    nav button{display:block;width:100%;text-align:left;background:transparent;color:#334155;margin:3px 0}
+    nav button.active,nav button:hover{background:#eaf1ff;color:#1d4ed8}
+    main{padding:22px;min-width:0}.page{display:none}.page.active{display:block}
+    .page-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}.page-title h2{margin:0;font-size:21px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 3px 12px #0f172a08}
+    .stat{font-size:25px;font-weight:850;margin-top:5px}.muted{color:var(--muted)}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.table-wrap{overflow:auto;margin-top:12px}
+    table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{font-size:11px;color:#64748b;text-transform:uppercase;background:#f8fafc}
+    .notice{padding:10px 12px;border-radius:9px;margin:10px 0;background:#eff6ff;color:#1e40af}.error{background:#fee2e2;color:#991b1b}
+    .pill{display:inline-block;border-radius:30px;padding:3px 9px;background:#e2e8f0;font-size:11px;font-weight:700}
+    .loading{position:fixed;inset:0;background:#0f172a66;display:grid;place-items:center;color:white;z-index:20;font-size:16px}
+    .inline{display:flex;gap:8px;align-items:center}.inline>*{flex:1}
+    @media(max-width:850px){.layout{grid-template-columns:1fr}nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px}nav button{white-space:nowrap;width:auto}.grid{grid-template-columns:1fr 1fr}main{padding:14px}}
+    @media(max-width:560px){header{align-items:flex-start}header strong{font-size:13px}.head-right{gap:4px}.head-right button{padding:8px;font-size:11px}.grid,.form-grid{grid-template-columns:1fr}.page-title h2{font-size:18px}}
+  </style>
+</head>
+<body>
+<div id="loading" class="loading hidden">Please wait…</div>
+<section id="auth" class="login-wrap">
+  <div class="login">
+    <div class="logo">CC</div><h1>COTTON CLUB BD LIMITED</h1><div class="sub">Extended Part · Production Entry</div>
+    <div id="loginPane">
+      <div class="field"><label>USERNAME</label><input id="loginUser" autocomplete="username"></div>
+      <div class="field"><label>PASSWORD</label><input id="loginPass" type="password" autocomplete="current-password"></div>
+      <button class="primary" onclick="doLogin()">Sign in</button>
+      <div id="loginMsg" class="notice hidden"></div>
+      <div class="switch">Need an account? <a onclick="showSignup()">Request access</a></div>
+    </div>
+    <div id="signupPane" class="hidden">
+      <div class="field"><label>USERNAME</label><input id="suUser"></div>
+      <div class="field"><label>PASSWORD (8+ characters)</label><input id="suPass" type="password"></div>
+      <div class="field"><label>CONFIRM PASSWORD</label><input id="suPass2" type="password"></div>
+      <button class="primary" onclick="doSignup()">Create account</button>
+      <div id="signupMsg" class="notice hidden"></div>
+      <div class="switch">Already registered? <a onclick="showLogin()">Sign in</a></div>
+    </div>
+  </div>
+</section>
+<div id="app" class="hidden">
+<header><div><strong>COTTON CLUB BD LIMITED</strong><small>EXTENDED PART · ROLL PRODUCTION</small></div>
+  <div class="head-right"><span id="who"></span><button onclick="refreshAll()">Refresh</button><button onclick="doLogout()">Logout</button></div>
+</header>
+<div class="layout">
+<nav>
+  <button class="active" data-page="entry" onclick="go('entry',this)">＋ New Roll Entry</button>
+  <button data-page="report" onclick="go('report',this)">▤ Daily Report</button>
+  <button data-page="search" onclick="go('search',this)">⌕ Data Search</button>
+  <button data-page="machines" class="admin-only hidden" onclick="go('machines',this)">⚙ Machines</button>
+  <button data-page="users" class="admin-only hidden" onclick="go('users',this)">♙ User Management</button>
+</nav>
+<main>
+<section id="entry" class="page active">
+  <div class="page-title"><h2>New Roll Entry</h2><span class="pill" id="version"></span></div>
+  <div class="grid">
+    <div class="card" style="grid-column:span 2">
+      <div class="form-grid">
+        <div class="field"><label>DATE</label><input type="date" id="date"></div>
+        <div class="field"><label>MACHINE NO.</label><select id="machine"></select></div>
+        <div class="field"><label>SHIFT</label><select id="shift"><option>A</option><option>B</option><option>C</option></select></div>
+        <div class="field"><label>PROGRAM NO.</label><input id="program" placeholder="Program number"></div>
+        <div class="field"><label>NEXT ROLL</label><input id="nextRoll" readonly value="—"></div>
+        <div class="field"><label>WEIGHT (KG)</label><input id="weight" type="number" min="0.01" step="0.01"></div>
+        <div class="field"><label>CONDITION</label><select id="condition"><option>OK</option><option>Hold up</option><option>Reject</option></select></div>
+      </div>
+      <div class="actions"><button class="primary" onclick="saveEntry()">Save Roll</button><button class="soft" onclick="clearEntry()">Clear</button></div>
+      <div id="entryMsg" class="notice hidden"></div>
+    </div>
+    <div class="card"><div class="muted">Today's visible production</div><div class="stat" id="todayTotal">0.00 Kg</div><hr style="border:0;border-top:1px solid var(--line);margin:15px 0"><div class="muted">Selected machine + shift</div><div class="stat" id="machineTotal">0.00 Kg</div><div class="muted" id="entryBy"></div></div>
+  </div>
+  <div class="card" style="margin-top:14px"><div class="page-title"><h2>Update / Delete Roll</h2></div>
+    <div class="form-grid">
+      <div class="field"><label>DATE</label><input type="date" id="upDate"></div>
+      <div class="field"><label>MACHINE</label><select id="upMachine"></select></div>
+      <div class="field"><label>SHIFT</label><select id="upShift"><option>A</option><option>B</option><option>C</option></select></div>
+      <div class="field"><label>ROLL</label><select id="upRoll" onchange="fillUpdate()"><option value="">Select roll</option></select></div>
+      <div class="field"><label>PROGRAM NO.</label><input id="upProgram"></div>
+      <div class="field"><label>WEIGHT (KG)</label><input id="upWeight" type="number" min="0.01" step="0.01"></div>
+      <div class="field"><label>CONDITION</label><select id="upCondition"><option>OK</option><option>Hold up</option><option>Reject</option></select></div>
+    </div>
+    <div class="actions"><button class="primary" onclick="updateEntry()">Update</button><button class="danger" onclick="deleteEntry()">Delete selected</button></div>
+    <div id="updateMsg" class="notice hidden"></div>
+  </div>
+</section>
+<section id="report" class="page">
+  <div class="page-title"><h2>Daily Production Report</h2></div>
+  <div class="card"><div class="inline"><div class="field"><label>DATE</label><input id="reportDate" type="date"></div><div class="field"><label>SHIFT</label><select id="reportShift"><option>All</option><option>A</option><option>B</option><option>C</option></select></div><button class="primary" onclick="loadReport()">View report</button></div>
+    <div id="reportTotal" class="stat">0.00 Kg</div><div class="table-wrap"><table><thead><tr><th>Machine</th><th>Shift</th><th>Program</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>R5</th><th>R6</th><th>R7</th><th>R8</th><th>R9</th><th>R10</th><th>Total Kg</th><th>Entered by</th></tr></thead><tbody id="reportBody"></tbody></table></div>
+  </div>
+</section>
+<section id="search" class="page">
+  <div class="page-title"><h2>Data Search</h2></div>
+  <div class="card"><div class="form-grid"><div class="field"><label>DATE</label><input id="searchDate" type="date"></div><div class="field"><label>MACHINE</label><select id="searchMachine"></select></div><div class="field"><label>SHIFT</label><select id="searchShift"><option>A</option><option>B</option><option>C</option></select></div></div><button class="primary" onclick="searchData()">Search</button><div id="searchResult" class="table-wrap"></div></div>
+</section>
+<section id="machines" class="page">
+  <div class="page-title"><h2>Machine Setup</h2></div>
+  <div class="card"><div class="inline"><div class="field"><label>NEW MACHINE NO.</label><input id="newMachine" placeholder="Enter machine number"></div><button class="primary" onclick="addMachine()">Add machine</button></div><div class="table-wrap"><table><thead><tr><th>Machine</th><th>Status</th><th>Action</th></tr></thead><tbody id="machineBody"></tbody></table></div><div id="machineMsg" class="notice hidden"></div></div>
+</section>
+<section id="users" class="page">
+  <div class="page-title"><h2>User Management</h2></div>
+  <div class="card"><div class="form-grid">
+    <div class="field"><label>USERNAME</label><input id="uName"></div><div class="field"><label>NEW PASSWORD (leave blank to keep current)</label><input id="uPass" type="password"></div>
+    <div class="field"><label>STATUS</label><select id="uStatus"><option>Active</option><option>Pending</option><option>Inactive</option></select></div>
+    <div class="field"><label>ROLE</label><select id="uRole"><option>Staff</option><option>Admin</option></select></div>
+    <div class="field"><label>CAN VIEW OTHERS</label><select id="uView"><option value="false">No</option><option value="true">Yes</option></select></div>
+    <div class="field"><label>PERMISSION</label><select id="uPermission"><option>ViewOnly</option><option>FullAccess</option></select></div>
+    <div class="field"><label>ASSIGNED SHIFT</label><select id="uShift"><option>A</option><option>B</option><option>C</option><option>All</option></select></div>
+  </div><button class="primary" onclick="saveUser()">Save user</button><div id="userMsg" class="notice hidden"></div>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Role</th><th>Status</th><th>View others</th><th>Permission</th><th>Shift</th><th>Action</th></tr></thead><tbody id="userBody"></tbody></table></div></div>
+</section>
+</main></div></div>
+<script>
+let token=sessionStorage.getItem('cc_token')||'', me=null, machines=[], updateRows=[];
+const $=id=>document.getElementById(id);
+function busy(on){$('loading').classList.toggle('hidden',!on)}
+function msg(id,text,error=false){const e=$(id);e.textContent=text;e.classList.remove('hidden','error');if(error)e.classList.add('error')}
+function call(name,args=[]){return new Promise((resolve,reject)=>{const runner=google.script.run.withSuccessHandler(resolve).withFailureHandler(e=>reject(new Error(e.message||e)))[name];runner(...args);})}
+function showLogin(){ $('signupPane').classList.add('hidden');$('loginPane').classList.remove('hidden'); }
+function showSignup(){ $('loginPane').classList.add('hidden');$('signupPane').classList.remove('hidden'); }
+async function doLogin(){busy(true);try{const r=await call('login',[$('loginUser').value.trim(),$('loginPass').value]);if(!r.success){msg('loginMsg',r.message,true);return;}token=r.token;sessionStorage.setItem('cc_token',token);await boot();}catch(e){msg('loginMsg',e.message,true)}finally{busy(false)}}
+async function doSignup(){const p=$('suPass').value;if(p!==$('suPass2').value){msg('signupMsg','Passwords do not match.',true);return;}busy(true);try{const r=await call('registerUser',[$('suUser').value,p]);msg('signupMsg',r,r!=='OK');}catch(e){msg('signupMsg',e.message,true)}finally{busy(false)}}
+async function boot(){busy(true);try{const b=await call('getBootstrap',[token]);me=b.user;machines=b.machines;$('auth').classList.add('hidden');$('app').classList.remove('hidden');$('who').textContent=me.username+' · '+me.role;$('version').textContent='v'+b.version;
+document.querySelectorAll('.admin-only').forEach(x=>x.classList.toggle('hidden',me.role!=='Admin'));
+const today=new Date().toLocaleDateString('en-CA');['date','upDate','reportDate','searchDate'].forEach(id=>$(id).value=today);
+fillMachines();if(me.assignedShift!=='All'&&me.role!=='Admin'){['shift','upShift','searchShift'].forEach(id=>{$(id).value=me.assignedShift;$(id).disabled=true;});}
+await loadStats();}catch(e){sessionStorage.removeItem('cc_token');token='';$('auth').classList.remove('hidden');msg('loginMsg',e.message,true)}finally{busy(false)}}
+function fillMachines(){['machine','upMachine','searchMachine'].forEach(id=>{$(id).innerHTML='';machines.forEach(m=>$(id).add(new Option(m,m)));});}
+async function doLogout(){try{await call('logout',[token])}catch(e){}sessionStorage.removeItem('cc_token');location.reload()}
+function go(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');if(id==='users')loadUsers();if(id==='machines')loadMachines();if(id==='report')loadReport();}
+async function loadStats(){if(!$('machine').value||!$('shift').value)return;busy(true);try{const r=await call('getMachineData',[$('machine').value,$('date').value,$('shift').value,token]);$('nextRoll').value=r.nextRoll;$('todayTotal').textContent=r.todayTotal+' Kg';$('machineTotal').textContent=r.totalWeight+' Kg';$('entryBy').textContent='Last entry by: '+r.enteredBy;if(r.lastProgram&&!$('program').value)$('program').value=r.lastProgram;}catch(e){msg('entryMsg',e.message,true)}finally{busy(false)}}
+async function saveEntry(){busy(true);try{const r=await call('saveData',[{date:$('date').value,machineNo:$('machine').value,shift:$('shift').value,programNo:$('program').value,weight:$('weight').value,condition:$('condition').value},token]);msg('entryMsg',r);$('weight').value='';await loadStats();}catch(e){msg('entryMsg',e.message,true)}finally{busy(false)}}
+function clearEntry(){$('program').value='';$('weight').value='';$('condition').value='OK';}
+async function fetchUpdate(){if(!$('upMachine').value)return;busy(true);try{const r=await call('getRollsForUpdate',[$('upDate').value,$('upMachine').value,$('upShift').value,token]);updateRows=r.rolls;$('upRoll').innerHTML='<option value="">Select roll</option>';updateRows.forEach(x=>$('upRoll').add(new Option(x.rollNo+' · '+x.weight+' Kg',x.rollId)));$('upProgram').value=r.program||'';}catch(e){msg('updateMsg',e.message,true)}finally{busy(false)}}
+function fillUpdate(){const r=updateRows.find(x=>x.rollId===$('upRoll').value);if(r){$('upWeight').value=r.weight;$('upCondition').value=r.condition;$('upProgram').value=r.programNo;}}
+async function updateEntry(){busy(true);try{const r=await call('updateRollData',[{date:$('upDate').value,machineNo:$('upMachine').value,shift:$('upShift').value,rollId:$('upRoll').value,weight:$('upWeight').value,condition:$('upCondition').value,programNo:$('upProgram').value},token]);msg('updateMsg',r);await fetchUpdate();await loadStats();}catch(e){msg('updateMsg',e.message,true)}finally{busy(false)}}
+async function deleteEntry(){if(!$('upRoll').value||!confirm('Delete this roll?'))return;busy(true);try{const r=await call('deleteRoll',[{date:$('upDate').value,machineNo:$('upMachine').value,shift:$('upShift').value,rollId:$('upRoll').value},token]);msg('updateMsg',r);await fetchUpdate();await loadStats();}catch(e){msg('updateMsg',e.message,true)}finally{busy(false)}}
+async function loadReport(){busy(true);try{const rows=await call('getDailyReportData',[$('reportDate').value,$('reportShift').value,token]);let total=0;$('reportBody').innerHTML='';rows.forEach(r=>{total+=Number(r.total);const tr=document.createElement('tr');const vals=[r.machine,r.shift,r.program,...r.rolls.map(x=>x.val),r.total,r.enteredBy];vals.forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});$('reportBody').appendChild(tr)});$('reportTotal').textContent=total.toFixed(2)+' Kg';}catch(e){alert(e.message)}finally{busy(false)}}
+async function searchData(){busy(true);try{const r=await call('searchVlookupData',[$('searchDate').value,$('searchMachine').value,$('searchShift').value,token]);const box=$('searchResult');box.innerHTML='';if(!r.found){box.textContent='No data found.';return;}const p=document.createElement('p');p.textContent='Program: '+r.program+' · Shift: '+r.shift+' · Entered by: '+r.enteredBy+' · Total: '+r.total+' Kg';box.appendChild(p);const table=document.createElement('table');const tr=document.createElement('tr');r.rolls.forEach((x,i)=>{const td=document.createElement('td');td.textContent='R'+(i+1)+': '+x.val;tr.appendChild(td)});table.appendChild(tr);box.appendChild(table);}catch(e){alert(e.message)}finally{busy(false)}}
+async function loadMachines(){busy(true);try{const rows=await call('getMachines',[token]);$('machineBody').innerHTML='';rows.forEach(r=>{const tr=document.createElement('tr');[r.machineNo,r.status].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});const td=document.createElement('td'),b=document.createElement('button');b.className='soft';b.textContent=r.status==='Active'?'Deactivate':'Activate';b.onclick=()=>changeMachine(r.machineNo,r.status==='Active'?'Inactive':'Active');td.appendChild(b);tr.appendChild(td);$('machineBody').appendChild(tr)});}catch(e){msg('machineMsg',e.message,true)}finally{busy(false)}}
+async function addMachine(){busy(true);try{await call('addMachine',[$('newMachine').value,token]);$('newMachine').value='';machines=machines.concat([]);const b=await call('getBootstrap',[token]);machines=b.machines;fillMachines();msg('machineMsg','Machine added.');await loadMachines();}catch(e){msg('machineMsg',e.message,true)}finally{busy(false)}}
+async function changeMachine(n,s){busy(true);try{await call('setMachineStatus',[n,s,token]);const b=await call('getBootstrap',[token]);machines=b.machines;fillMachines();await loadMachines();}catch(e){msg('machineMsg',e.message,true)}finally{busy(false)}}
+async function loadUsers(){busy(true);try{const rows=await call('getAllUsers',[token]);$('userBody').innerHTML='';rows.forEach(u=>{const tr=document.createElement('tr');[u.username,u.role,u.status,u.canViewOthers?'Yes':'No',u.permission,u.assignedShift].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});const td=document.createElement('td'),edit=document.createElement('button');edit.className='soft';edit.textContent='Edit';edit.onclick=()=>{ $('uName').value=u.username;$('uPass').value='';$('uStatus').value=u.status;$('uRole').value=u.role;$('uView').value=String(u.canViewOthers);$('uPermission').value=u.permission;$('uShift').value=u.assignedShift;};td.appendChild(edit);if(u.username.toLowerCase()!=='admin'){const del=document.createElement('button');del.className='danger';del.textContent='Delete';del.onclick=()=>removeUser(u.username);td.appendChild(del)}tr.appendChild(td);$('userBody').appendChild(tr)});}catch(e){msg('userMsg',e.message,true)}finally{busy(false)}}
+async function saveUser(){busy(true);try{const r=await call('saveUser',[{username:$('uName').value,password:$('uPass').value,status:$('uStatus').value,role:$('uRole').value,canViewOthers:$('uView').value==='true',permission:$('uPermission').value,assignedShift:$('uShift').value},token]);msg('userMsg',r);$('uName').value='';$('uPass').value='';await loadUsers();}catch(e){msg('userMsg',e.message,true)}finally{busy(false)}}
+async function removeUser(n){if(!confirm('Delete '+n+'?'))return;busy(true);try{const r=await call('deleteUser',[n,token]);msg('userMsg',r);await loadUsers()}catch(e){msg('userMsg',e.message,true)}finally{busy(false)}}
+async function refreshAll(){await loadStats();await fetchUpdate();await loadReport()}
+$('machine').addEventListener('change',loadStats);$('shift').addEventListener('change',loadStats);$('date').addEventListener('change',loadStats);
+['upDate','upMachine','upShift'].forEach(id=>$(id).addEventListener('change',fetchUpdate));
+if(token)boot();
+</script>
+</body></html>
