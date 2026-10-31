@@ -1,0 +1,306 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cotton Club BD Limited</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f2f5fa;color:#182238}
+header{background:#14213d;color:white;padding:17px 22px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:8px;padding:10px 15px;background:#2458d3;color:white;cursor:pointer}
+input,select{width:100%;padding:11px;border:1px solid #dce2ec;border-radius:8px;margin-top:5px}
+label{display:block;margin-top:13px;font-size:13px;color:#56627a}
+.login{max-width:400px;margin:8vh auto;background:white;padding:25px;border-radius:15px}
+.app{display:none}
+.layout{display:grid;grid-template-columns:210px 1fr;gap:18px;padding:18px;max-width:1300px;margin:auto}
+nav,.card{background:white;padding:16px;border-radius:13px}
+nav button{display:block;width:100%;margin:5px 0;text-align:left;background:#edf2ff;color:#23418b}
+nav button.active{background:#2458d3;color:white}
+.card{margin-bottom:15px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{font-size:27px;font-weight:bold;margin-top:8px}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+table{width:100%;border-collapse:collapse;min-width:600px}
+td,th{padding:10px;border-bottom:1px solid #e5eaf2;text-align:left}
+.table{overflow:auto;margin-top:15px}
+section{min-width:0}
+.hidden{display:none}
+.muted{color:#718096}
+@media(max-width:750px){
+.layout{grid-template-columns:1fr}
+nav{display:flex;overflow:auto;gap:5px}
+nav button{min-width:max-content}
+.grid{grid-template-columns:repeat(2,1fr)}
+.row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="login" class="login">
+<h2>COTTON CLUB BD LIMITED</h2>
+<p class="muted">Production Management</p>
+<div id="setup">
+<p>First time? Create your Admin account.</p>
+<label>Admin Username</label>
+<input id="adminName" value="admin">
+<label>Admin Password</label>
+<input id="adminPass" type="password">
+<button onclick="createAdmin()" style="width:100%;margin-top:15px">Create Admin</button>
+</div>
+<div id="signin" class="hidden">
+<label>Username</label>
+<input id="username">
+<label>Password</label>
+<input id="password" type="password">
+<button onclick="login()" style="width:100%;margin-top:15px">Login</button>
+</div>
+<p id="loginMsg"></p>
+</div>
+
+<div id="app" class="app">
+<header>
+<div><b>COTTON CLUB BD LIMITED</b><br><small>Production Management</small></div>
+<div><span id="logged"></span> <button onclick="logout()">Logout</button></div>
+</header>
+
+<div class="layout">
+<nav>
+<button class="active" onclick="show('dashboard',this)">Dashboard</button>
+<button onclick="show('entry',this)">Roll Entry</button>
+<button onclick="show('records',this)">All Records</button>
+<button onclick="show('report',this)">Daily Report</button>
+<button onclick="show('machines',this)">Machines</button>
+<button id="userMenu" onclick="show('users',this)">Users</button>
+<button onclick="show('backup',this)">Backup</button>
+</nav>
+
+<main>
+<section id="dashboard">
+<h2>Dashboard</h2>
+<div class="grid">
+<div class="card">Total Rolls<div class="stat" id="totalRolls">0</div></div>
+<div class="card">Total Weight<div class="stat" id="totalWeight">0</div><small>KG</small></div>
+<div class="card">Machines<div class="stat" id="totalMachines">0</div></div>
+<div class="card">Today's Entry<div class="stat" id="todayRolls">0</div></div>
+</div>
+<div class="card"><h3>Recent Entries</h3><div id="recent"></div></div>
+</section>
+
+<section id="entry" class="hidden">
+<h2>Roll Entry</h2>
+<div class="card">
+<div class="row">
+<div><label>Date</label><input id="date" type="date"></div>
+<div><label>Machine</label><select id="machine"></select></div>
+<div><label>Shift</label><select id="shift"><option>A</option><option>B</option><option>C</option></select></div>
+<div><label>Program / Style</label><input id="program"></div>
+<div><label>Roll Number</label><input id="roll"></div>
+<div><label>Weight (KG)</label><input id="weight" type="number" min="0" step="0.01"></div>
+<div><label>Condition</label><select id="condition"><option>Good</option><option>Hold</option><option>Reject</option></select></div>
+<div><label>Remark</label><input id="remark"></div>
+</div>
+<button onclick="saveEntry()" style="margin-top:18px">Save Entry</button>
+<button onclick="clearForm()" style="background:#64748b">Clear</button>
+<p id="entryMsg"></p>
+</div>
+</section>
+
+<section id="records" class="hidden">
+<h2>All Records</h2>
+<div class="card">
+<label>Search</label><input id="search" oninput="renderRecords()" placeholder="Search machine, roll, style">
+<div id="recordsTable"></div>
+</div>
+</section>
+
+<section id="report" class="hidden">
+<h2>Daily Report</h2>
+<div class="card">
+<label>Select Date</label><input id="reportDate" type="date" onchange="renderReport()">
+<div id="reportData"></div>
+</div>
+</section>
+
+<section id="machines" class="hidden">
+<h2>Machine Management</h2>
+<div class="card">
+<label>Machine Number</label><input id="newMachine" placeholder="Enter machine number">
+<button onclick="addMachine()">Add Machine</button>
+<div id="machineList"></div>
+</div>
+</section>
+
+<section id="users" class="hidden">
+<h2>User Management</h2>
+<div class="card">
+<label>Username</label><input id="newUser">
+<label>Password</label><input id="newPassword" type="password">
+<label>Role</label><select id="newRole"><option>Staff</option><option>Admin</option></select>
+<button onclick="addUser()">Create User</button>
+<div id="userList"></div>
+</div>
+</section>
+
+<section id="backup" class="hidden">
+<h2>Backup & Restore</h2>
+<div class="card">
+<p>Download your data backup regularly.</p>
+<button onclick="downloadBackup()">Download Backup</button>
+<label>Restore Backup File</label>
+<input type="file" accept=".json" onchange="restoreBackup(event)">
+<p id="backupMsg"></p>
+</div>
+</section>
+</main>
+</div>
+</div>
+
+<script>
+const KEY="cotton_club_github_app";
+let db=JSON.parse(localStorage.getItem(KEY)||'{"users":[],"machines":[],"records":[]}');
+let current=null;
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+function persist(){localStorage.setItem(KEY,JSON.stringify(db))}
+function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function init(){
+ if(db.users.length){
+  $("setup").classList.add("hidden");
+  $("signin").classList.remove("hidden");
+ }
+}
+function createAdmin(){
+ let u=$("adminName").value.trim(),p=$("adminPass").value;
+ if(!u||p.length<6){$("loginMsg").textContent="Password must be at least 6 characters.";return}
+ db.users.push({username:u,password:p,role:"Admin"});
+ persist();init();
+ $("loginMsg").textContent="Admin created. Please login.";
+ $("username").value=u;
+}
+function login(){
+ let u=$("username").value.trim(),p=$("password").value;
+ let user=db.users.find(x=>x.username===u&&x.password===p);
+ if(!user){$("loginMsg").textContent="Wrong username or password.";return}
+ current=user;
+ $("login").style.display="none";
+ $("app").style.display="block";
+ $("logged").textContent=u+" ("+user.role+")";
+ $("userMenu").style.display=user.role==="Admin"?"block":"none";
+ $("date").value=today();
+ $("reportDate").value=today();
+ refresh();
+}
+function logout(){
+ current=null;$("app").style.display="none";$("login").style.display="block";
+ $("password").value="";
+}
+function show(id,btn){
+ document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));
+ $(id).classList.remove("hidden");
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");refresh();
+}
+function refresh(){
+ renderMachines();renderMachineSelect();renderDashboard();renderRecords();renderReport();renderUsers();
+}
+function renderMachineSelect(){
+ $("machine").innerHTML=db.machines.map(m=>`<option>${escapeHTML(m)}</option>`).join("");
+}
+function addMachine(){
+ let m=$("newMachine").value.trim();
+ if(!m)return alert("Enter machine number");
+ if(db.machines.includes(m))return alert("Machine already exists");
+ db.machines.push(m);persist();$("newMachine").value="";refresh();
+}
+function renderMachines(){
+ $("machineList").innerHTML='<div class="table"><table>'+db.machines.map(m=>
+ `<tr><td>${escapeHTML(m)}</td><td><button onclick="removeMachine('${escapeHTML(m)}')">Remove</button></td></tr>`
+ ).join("")+'</table></div>';
+}
+function removeMachine(m){
+ if(confirm("Remove machine "+m+"?")){
+ db.machines=db.machines.filter(x=>x!==m);persist();refresh();
+ }
+}
+function saveEntry(){
+ let r={
+ id:Date.now(),date:$("date").value,machine:$("machine").value,
+ shift:$("shift").value,program:$("program").value.trim(),
+ roll:$("roll").value.trim(),weight:Number($("weight").value),
+ condition:$("condition").value,remark:$("remark").value.trim(),
+ user:current.username
+ };
+ if(!r.date||!r.machine||!r.roll||r.weight<=0||!Number.isFinite(r.weight)){
+ $("entryMsg").textContent="Please fill Date, Machine, Roll Number and valid Weight.";return;
+ }
+ db.records.push(r);persist();clearForm();refresh();
+ $("entryMsg").textContent="Entry saved successfully.";
+}
+function clearForm(){
+ ["program","roll","weight","remark"].forEach(x=>$(x).value="");
+}
+function makeTable(rows){
+ if(!rows.length)return "<p>No records found.</p>";
+ return '<div class="table"><table><tr><th>Date</th><th>Machine</th><th>Shift</th><th>Roll</th><th>Weight</th><th>Condition</th></tr>'+
+ rows.map(r=>`<tr><td>${escapeHTML(r.date)}</td><td>${escapeHTML(r.machine)}</td><td>${escapeHTML(r.shift)}</td><td>${escapeHTML(r.roll)}</td><td>${r.weight}</td><td>${escapeHTML(r.condition)}</td></tr>`).join("")+
+ '</table></div>';
+}
+function renderDashboard(){
+ $("totalRolls").textContent=db.records.length;
+ $("totalWeight").textContent=db.records.reduce((s,r)=>s+r.weight,0).toFixed(2);
+ $("totalMachines").textContent=db.machines.length;
+ $("todayRolls").textContent=db.records.filter(r=>r.date===today()).length;
+ $("recent").innerHTML=makeTable(db.records.slice(-5).reverse());
+}
+function renderRecords(){
+ if(!$("recordsTable"))return;
+ let q=($("search").value||"").toLowerCase();
+ let rows=db.records.filter(r=>JSON.stringify(r).toLowerCase().includes(q)).reverse();
+ $("recordsTable").innerHTML=makeTable(rows);
+}
+function renderReport(){
+ if(!$("reportData"))return;
+ let d=$("reportDate").value||today();
+ let rows=db.records.filter(r=>r.date===d);
+ let total=rows.reduce((s,r)=>s+r.weight,0);
+ $("reportData").innerHTML=`<h3>${d}</h3><p>Total Rolls: ${rows.length} | Total Weight: ${total.toFixed(2)} KG</p>`+makeTable(rows);
+}
+function addUser(){
+ if(current.role!=="Admin")return;
+ let u=$("newUser").value.trim(),p=$("newPassword").value,role=$("newRole").value;
+ if(!u||p.length<6)return alert("Username and password (minimum 6 characters) required");
+ if(db.users.some(x=>x.username===u))return alert("Username already exists");
+ db.users.push({username:u,password:p,role});persist();
+ $("newUser").value="";$("newPassword").value="";renderUsers();
+}
+function renderUsers(){
+ if(!current||current.role!=="Admin")return;
+ $("userList").innerHTML='<div class="table"><table><tr><th>Username</th><th>Role</th></tr>'+
+ db.users.map(u=>`<tr><td>${escapeHTML(u.username)}</td><td>${escapeHTML(u.role)}</td></tr>`).join("")+
+ '</table></div>';
+}
+function downloadBackup(){
+ let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
+ let a=document.createElement("a");a.href=URL.createObjectURL(blob);
+ a.download="cotton-club-backup.json";a.click();URL.revokeObjectURL(a.href);
+}
+function restoreBackup(e){
+ let f=e.target.files[0];if(!f)return;
+ let reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   let data=JSON.parse(reader.result);
+   if(!Array.isArray(data.users)||!Array.isArray(data.records)||!Array.isArray(data.machines))throw Error();
+   db=data;persist();refresh();$("backupMsg").textContent="Backup restored.";
+  }catch(err){$("backupMsg").textContent="Invalid backup file."}
+ };
+ reader.readAsText(f);
+}
+init();
+</script>
+</body>
+</html>
